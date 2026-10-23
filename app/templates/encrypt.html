@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFileVault | Encrypt Files</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: #111827;
+            border-right: 1px solid #273449;
+            padding: 28px 18px;
+        }
+
+        .brand {
+            color: #60a5fa;
+            font-size: 21px;
+            font-weight: bold;
+            margin-bottom: 38px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 14px;
+            margin-bottom: 9px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 38px;
+        }
+
+        .header {
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+        }
+
+        .header p,
+        .description {
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .card {
+            max-width: 950px;
+            background: #111827;
+            border: 1px solid #273449;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .path-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            min-width: 0;
+            background: #0b1120;
+            color: #e5e7eb;
+            border: 1px solid #374151;
+            border-radius: 7px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .path-input input {
+            flex: 1;
+        }
+
+        input::placeholder {
+            color: #6b7280;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .browse-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .browse-button:hover {
+            background: #1d4ed8;
+        }
+
+        .algorithm-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            border: 1px solid #374151;
+            border-radius: 9px;
+            margin-bottom: 12px;
+        }
+
+        .algorithm-option input {
+            margin-top: 4px;
+            accent-color: #3b82f6;
+        }
+
+        .algorithm-option strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .algorithm-option small {
+            margin-top: 0;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 17px 0;
+            font-size: 14px;
+        }
+
+        .checkbox-option input {
+            accent-color: #3b82f6;
+        }
+
+        .notice {
+            border-left: 3px solid #f59e0b;
+            background: #292213;
+            padding: 13px;
+            color: #fcd34d;
+            font-size: 13px;
+            line-height: 1.6;
+            border-radius: 4px;
+            margin-bottom: 22px;
+        }
+
+        .start-button {
+            background: #2563eb;
+            color: white;
+            padding: 14px 22px;
+            margin-top: 8px;
+        }
+
+        .start-button:hover {
+            background: #1d4ed8;
+        }
+
+        #status {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 7px;
+            background: #0b1120;
+            color: #93c5fd;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .preview {
+            display: none;
+            margin-top: 20px;
+            padding: 18px;
+            background: #0b1120;
+            border: 1px solid #374151;
+            border-radius: 9px;
+            overflow-wrap: anywhere;
+        }
+
+        .preview h3 {
+            margin-bottom: 12px;
+        }
+
+        .preview p {
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .preview-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        small {
+            display: block;
+            color: #9ca3af;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 9px;
+        }
+
+        @media (max-width: 700px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 18px;
+            }
+
+            .brand {
+                margin-bottom: 18px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .path-input {
+                flex-direction: column;
+            }
+
+            .path-input button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">🔐 SecureFileVault</div>
+            <nav>
+                <a class="nav-link" href="/">⌂ Home</a>
+                <a class="nav-link active" href="/encrypt">🔒 Encrypt</a>
+                <a class="nav-link" href="/decrypt">🔓 Decrypt</a>
+                <a class="nav-link" href="/reports">▤ Hash Reports</a>
+                <a class="nav-link" href="/settings">⚙ Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <h1>Encrypt Files</h1>
+                <p>Select a source folder and an output location.
+                    A separate encrypted copy will be created.</p>
+            </header>
+
+            <section class="card">
+                <h2>Folder Selection</h2>
+                <p class="description">
+                    Select the folder containing your original files and
+                    choose where the encrypted copy should be created.
+                </p>
+
+                <div class="form-group">
+                    <label for="source">Source Folder</label>
+                    <div class="path-input">
+                        <input type="text" id="source" placeholder="Choose source folder..." readonly>
+                        <button type="button" class="browse-button" id="browseSource">
+                            Choose Folder
+                        </button>
+                    </div>
+                    <small>Your original files will not be deleted or modified intentionally.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="output">Output Location</label>
+                    <div class="path-input">
+                        <input type="text" id="output" placeholder="Choose output parent folder..." readonly>
+                        <button type="button" class="browse-button" id="browseOutput">
+                            Choose Location
+                        </button>
+                    </div>
+                    <small>A unique encrypted folder will be created inside this location.</small>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Encryption Configuration</h2>
+                <p class="description">
+                    AES-256-GCM is currently the only implemented algorithm.
+                </p>
+
+                <label class="algorithm-option">
+                    <input type="radio" name="algorithm" value="AES-256-GCM" checked>
+                    <span>
+                        <strong>AES-256-GCM</strong>
+                        <small>Authenticated encryption that detects unauthorized data changes.</small>
+                    </span>
+                </label>
+
+                <label class="algorithm-option">
+                    <input type="radio" disabled>
+                    <span>
+                        <strong>ChaCha20-Poly1305 — Coming soon</strong>
+                        <small>Not implemented yet.</small>
+                    </span>
+                </label>
+
+                <label class="algorithm-option">
+                    <input type="radio" disabled>
+                    <span>
+                        <strong>AES-256-CBC + HMAC-SHA-256 — Coming soon</strong>
+                        <small>Not implemented yet.</small>
+                    </span>
+                </label>
+            </section>
+
+            <section class="card">
+                <h2>Owner Email Registration</h2>
+                <p class="description">
+                    Verify the email address that will be associated with this encrypted vault.
+                    You will need access to this email when decrypting the vault.
+                </p>
+
+                <div class="form-group">
+                    <label for="ownerEmail">Owner Email</label>
+                    <div class="path-input">
+                        <input type="email" id="ownerEmail" placeholder="Enter the vault owner's email"
+                            autocomplete="email" required>
+                        <button type="button" class="browse-button" id="sendOwnerOtp">
+                            Send OTP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerOtp">Six-Digit OTP</label>
+                    <div class="path-input">
+                        <input type="text" id="ownerOtp" placeholder="Enter the OTP from your email" inputmode="numeric"
+                            maxlength="6" autocomplete="one-time-code">
+                        <button type="button" class="browse-button" id="verifyOwnerOtp">
+                            Verify OTP
+                        </button>
+                    </div>
+                    <small id="ownerOtpStatus" role="status" aria-live="polite">
+                        Verify the owner email before starting encryption.
+                    </small>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Encryption Password</h2>
+                <p class="description">
+                    Use a strong password and keep it safe. Password recovery
+                    is not implemented.
+                </p>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" autocomplete="new-password"
+                        placeholder="Enter a strong password">
+                    <small>Use at least 12 characters.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" autocomplete="new-password"
+                        placeholder="Re-enter your password">
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Integrity Report</h2>
+                <p class="description">
+                    Optionally create an Excel report containing the original
+                    and encrypted files' SHA-256 hashes and file sizes.
+                </p>
+
+                <label class="checkbox-option">
+                    <input type="checkbox" id="preserve" checked disabled>
+                    Preserve original files (always enabled)
+                </label>
+
+                <label class="checkbox-option">
+                    <input type="checkbox" id="hashReport" checked>
+                    Generate Excel SHA-256 integrity report
+                </label>
+
+                <div class="notice">
+                    <div class="notice">
+                        The Excel report is saved in the operation folder, alongside
+                        the encrypted_files folder. It is an audit report!
+                    </div>
+
+                    <button type="button" class="browse-button" id="scanFolder">
+                        Scan Folder
+                    </button>
+
+                    <div id="scanPreview" class="preview">
+                        <h3>Folder Scan Results</h3>
+                        <p id="scanSource"></p>
+                        <p id="scanCount"></p>
+                        <p id="scanSize"></p>
+                        <div id="scanFiles" class="preview-list"></div>
+                        <p id="scanSkipped"></p>
+                    </div>
+
+                    <div style="margin-top: 18px;">
+                        <button type="button" class="browse-button" id="calculateHashes">
+                            Calculate SHA-256 Hashes
+                        </button>
+                    </div>
+
+                    <div id="hashPreview" class="preview">
+                        <h3>SHA-256 Hash Results</h3>
+                        <p id="hashCount"></p>
+                        <div id="hashFiles" class="preview-list"></div>
+                        <p id="hashSkipped"></p>
+                    </div>
+
+                    <button type="button" class="start-button" id="startEncryption">
+                        Start Encryption
+                    </button>
+
+                    <div id="status" role="status" aria-live="polite">
+                        Select a source folder and output location to continue.
+                    </div>
+
+                    <div id="encryptionResult" class="preview" aria-live="polite"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function browseFolder(type) {
+            const status = document.getElementById("status");
+            const inputId = type === "source" ? "source" : "output";
+
+            status.textContent = "Opening folder picker...";
+
+            try {
+                const response = await fetch("/api/select-folder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: type })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    status.textContent = data.cancelled
+                        ? "Folder selection cancelled."
+                        : (data.message || "Folder selection failed.");
+                    return;
+                }
+
+                document.getElementById(inputId).value = data.path;
+                document.getElementById("scanPreview").style.display = "none";
+                document.getElementById("hashPreview").style.display = "none";
+                document.getElementById("encryptionResult").style.display = "none";
+
+                status.textContent = type === "source"
+                    ? "Source folder selected."
+                    : "Output location selected.";
+            } catch (error) {
+                status.textContent =
+                    "Could not contact Flask. Check whether the application is running.";
+            }
+        }
+
+        document.getElementById("browseSource").addEventListener("click", () => {
+            browseFolder("source");
+        });
+
+        document.getElementById("browseOutput").addEventListener("click", () => {
+            browseFolder("output");
+        });
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return "0 bytes";
+
+            const units = ["bytes", "KB", "MB", "GB", "TB"];
+            const index = Math.min(
+                Math.floor(Math.log(bytes) / Math.log(1024)),
+                units.length - 1
+            );
+
+            return (bytes / Math.pow(1024, index)).toFixed(2) + " " + units[index];
+        }
+
+        document.getElementById("scanFolder").addEventListener("click", async () => {
+            const source = document.getElementById("source").value;
+            const status = document.getElementById("status");
+            const button = document.getElementById("scanFolder");
+            const preview = document.getElementById("scanPreview");
+
+            if (!source) {
+                status.textContent = "Please select a source folder first.";
+                return;
+            }
+
+            button.disabled = true;
+            preview.style.display = "none";
+            status.textContent = "Scanning folder...";
+
+            try {
+                const response = await fetch("/api/scan-folder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ source })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    status.textContent = data.message || "Folder scan failed.";
+                    return;
+                }
+
+                const scan = data.scan;
+                document.getElementById("scanSource").textContent =
+                    "Source: " + scan.source;
+                document.getElementById("scanCount").textContent =
+                    "Files found: " + scan.file_count;
+                document.getElementById("scanSize").textContent =
+                    "Total size: " + formatBytes(scan.total_size_bytes);
+
+                const container = document.getElementById("scanFiles");
+                container.replaceChildren();
+
+                if (scan.files.length === 0) {
+                    container.textContent = "No files found.";
+                } else {
+                    scan.files.forEach(file => {
+                        const item = document.createElement("div");
+                        item.textContent =
+                            file.path + " (" + formatBytes(file.size_bytes) + ")";
+                        container.appendChild(item);
+                    });
+                }
+
+                document.getElementById("scanSkipped").textContent =
+                    "Skipped items: " + scan.skipped.length;
+
+                preview.style.display = "block";
+                status.textContent = "Scan completed. No files were modified.";
+            } catch (error) {
+                status.textContent =
+                    "Could not scan the folder. Check the Flask terminal.";
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        document.getElementById("calculateHashes").addEventListener("click", async () => {
+            const source = document.getElementById("source").value;
+            const status = document.getElementById("status");
+            const button = document.getElementById("calculateHashes");
+            const preview = document.getElementById("hashPreview");
+
+            if (!source) {
+                status.textContent = "Please select a source folder first.";
+                return;
+            }
+
+            button.disabled = true;
+            preview.style.display = "none";
+            status.textContent = "Calculating SHA-256 hashes...";
+
+            try {
+                const response = await fetch("/api/hash-folder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ source })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    status.textContent = data.message || "Hash calculation failed.";
+                    return;
+                }
+
+                const hashes = data.hashes;
+                const container = document.getElementById("hashFiles");
+                container.replaceChildren();
+
+                document.getElementById("hashCount").textContent =
+                    "Files hashed: " + hashes.file_count;
+
+                if (hashes.files.length === 0) {
+                    container.textContent = "No files were hashed.";
+                } else {
+                    hashes.files.forEach(file => {
+                        const item = document.createElement("div");
+                        const pathLine = document.createElement("div");
+                        const hashLine = document.createElement("div");
+
+                        pathLine.textContent = "File: " + file.path;
+                        hashLine.textContent = "SHA-256: " + file.sha256;
+                        hashLine.style.color = "#93c5fd";
+                        hashLine.style.marginBottom = "14px";
+
+                        item.append(pathLine, hashLine);
+                        container.appendChild(item);
+                    });
+                }
+
+                document.getElementById("hashSkipped").textContent =
+                    "Skipped items: " + hashes.skipped.length;
+
+                preview.style.display = "block";
+                status.textContent =
+                    "Hash calculation completed. Original files were not modified.";
+            } catch (error) {
+                status.textContent =
+                    "Could not calculate hashes. Check the Flask terminal.";
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+
+    const ownerEmailInput = document.getElementById("ownerEmail");
+    const ownerOtpInput = document.getElementById("ownerOtp");
+    const ownerOtpStatus = document.getElementById("ownerOtpStatus");
+    const sendOwnerOtpButton = document.getElementById("sendOwnerOtp");
+    const verifyOwnerOtpButton = document.getElementById("verifyOwnerOtp");
+    const startEncryptionButton = document.getElementById("startEncryption");
+
+    let ownerEmailVerified = false;
+    let verifiedOwnerEmail = "";
+
+    startEncryptionButton.disabled = true;
+
+    function resetOwnerEmailVerification() {
+        ownerEmailVerified = false;
+        verifiedOwnerEmail = "";
+        startEncryptionButton.disabled = true;
+    }
+
+    ownerEmailInput.addEventListener("input", function () {
+        if (this.value.trim().toLowerCase() !== verifiedOwnerEmail.toLowerCase()) {
+            resetOwnerEmailVerification();
+            ownerOtpStatus.textContent = "Verify this owner email before encrypting.";
+        }
+    });
+
+    sendOwnerOtpButton.addEventListener("click", async function () {
+        const email = ownerEmailInput.value.trim();
+
+        if (!email || !ownerEmailInput.checkValidity()) {
+            ownerOtpStatus.textContent = "Enter a valid owner email address.";
+            ownerEmailInput.focus();
+            return;
+        }
+
+        resetOwnerEmailVerification();
+        sendOwnerOtpButton.disabled = true;
+        ownerOtpStatus.textContent = "Sending OTP email...";
+
+        try {
+            const response = await fetch("/api/request-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+            ownerOtpStatus.textContent =
+                data.message || (response.ok ? "OTP sent." : "Could not send OTP.");
+
+            if (response.ok && data.success) {
+                ownerOtpInput.value = "";
+                ownerOtpInput.focus();
+            }
+        } catch (error) {
+            ownerOtpStatus.textContent =
+                "Could not contact Flask. Check the application terminal.";
+        } finally {
+            sendOwnerOtpButton.disabled = false;
+        }
+    });
+
+    verifyOwnerOtpButton.addEventListener("click", async function () {
+        const otp = ownerOtpInput.value.trim();
+
+        if (!/^\d{6}$/.test(otp)) {
+            ownerOtpStatus.textContent = "Enter the six-digit OTP.";
+            ownerOtpInput.focus();
+            return;
+        }
+
+        verifyOwnerOtpButton.disabled = true;
+        ownerOtpStatus.textContent = "Verifying OTP...";
+
+        try {
+            const response = await fetch("/api/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                resetOwnerEmailVerification();
+                ownerOtpStatus.textContent =
+                    data.message || "OTP verification failed.";
+                return;
+            }
+
+            ownerEmailVerified = true;
+            verifiedOwnerEmail = ownerEmailInput.value.trim();
+            startEncryptionButton.disabled = false;
+            ownerOtpStatus.textContent =
+                "Owner email verified. You can now encrypt.";
+        } catch (error) {
+            resetOwnerEmailVerification();
+            ownerOtpStatus.textContent =
+                "Could not contact Flask. Check the application terminal.";
+        } finally {
+            verifyOwnerOtpButton.disabled = false;
+        }
+    });
+
+
+        document.getElementById("startEncryption").addEventListener("click", async () => {
+            const source = document.getElementById("source").value.trim();
+            const output = document.getElementById("output").value.trim();
+            const passwordInput = document.getElementById("password");
+            const confirmInput = document.getElementById("confirmPassword");
+            const password = passwordInput.value;
+            const confirmPassword = confirmInput.value;
+            const status = document.getElementById("status");
+            const button = document.getElementById("startEncryption");
+            const resultPanel = document.getElementById("encryptionResult");
+
+            resultPanel.replaceChildren();
+            resultPanel.style.display = "none";
+
+            if (!source) {
+                status.textContent = "Please select a source folder first.";
+                return;
+            }
+
+            if (!output) {
+                status.textContent = "Please select an output location first.";
+                return;
+            }
+
+            if (password.length < 12) {
+                status.textContent = "Use a password with at least 12 characters.";
+                passwordInput.focus();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                status.textContent = "The passwords do not match.";
+                confirmInput.focus();
+                return;
+            }
+
+            const algorithm =
+                document.querySelector('input[name="algorithm"]:checked').value;
+
+            const generateReport =
+                document.getElementById("hashReport").checked;
+
+            if (
+                !ownerEmailVerified ||
+                ownerEmailInput.value.trim().toLowerCase() !==
+                verifiedOwnerEmail.toLowerCase()
+            ) {
+                status.textContent = "Please verify the owner email OTP first.";
+                ownerEmailInput.focus();
+                return;
+            }
+
+            button.disabled = true;
+            status.textContent = "Encrypting files. Please keep this page open...";
+
+            try {
+                const response = await fetch("/api/encrypt-folder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        source: source,
+                        output_parent: output,
+                        password: password,
+                        algorithm: algorithm,
+                        generate_report: generateReport,
+                        owner_email: ownerEmailInput.value.trim()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    status.textContent = data.message || "Folder encryption failed.";
+                    return;
+                }
+
+                const details = data.result;
+
+                const heading = document.createElement("h3");
+                heading.textContent = "Encryption Results";
+
+                const operationLine = document.createElement("p");
+                operationLine.textContent =
+                    "Operation folder: " + (details.operation_folder || "Not provided");
+
+                const outputLine = document.createElement("p");
+                outputLine.textContent =
+                    "Encrypted files folder: " + details.output_folder;
+
+                const countLine = document.createElement("p");
+                countLine.textContent = "Files encrypted: " + details.encrypted_file_count;
+
+                const algorithmLine = document.createElement("p");
+                algorithmLine.textContent = "Algorithm: " + details.algorithm;
+
+                resultPanel.append(heading, outputLine, countLine, algorithmLine);
+
+                if (generateReport) {
+                    if (data.report && data.report.report_path) {
+                        const reportHeading = document.createElement("h3");
+                        reportHeading.textContent = "Excel Integrity Report";
+                        reportHeading.style.marginTop = "20px";
+
+                        const reportLine = document.createElement("p");
+                        reportLine.textContent =
+                            "Report saved at: " + data.report.report_path;
+
+                        const reportCount = document.createElement("p");
+                        reportCount.textContent =
+                            "Files included in report: " + data.report.record_count;
+
+                        resultPanel.append(reportHeading, reportLine, reportCount);
+                    } else {
+                        const warningHeading = document.createElement("h3");
+                        warningHeading.textContent = "Report Generation Failed";
+                        warningHeading.style.color = "#fbbf24";
+                        warningHeading.style.marginTop = "20px";
+
+                        const warning = document.createElement("p");
+                        warning.textContent = data.report_error
+                            ? "Details: " + data.report_error
+                            : "The server did not return a report path or an error message.";
+
+                        resultPanel.append(warningHeading, warning);
+                    }
+                } else {
+                    const skippedReport = document.createElement("p");
+                    skippedReport.textContent = "Excel report generation was not selected.";
+                    resultPanel.appendChild(skippedReport);
+                }
+
+                const note = document.createElement("p");
+                note.textContent =
+                    "Original files were preserved. Keep your password safe; password recovery is unavailable.";
+                note.style.marginTop = "12px";
+                resultPanel.appendChild(note);
+
+                resultPanel.style.display = "block";
+
+                if (generateReport && !data.report) {
+                    status.textContent =
+                        "Encryption succeeded, but Excel report generation failed. See the details below.";
+                } else {
+                    status.textContent = generateReport
+                        ? "Encryption and Excel report generation completed successfully."
+                        : "Encryption completed successfully.";
+                }
+
+            } catch (error) {
+                console.error("Encryption request error:", error);
+                status.textContent =
+                    "Could not complete the request. Check the Flask terminal and browser console.";
+            } finally {
+                passwordInput.value = "";
+                confirmInput.value = "";
+                button.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

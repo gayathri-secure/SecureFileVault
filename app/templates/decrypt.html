@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decrypt | SecureFileVault</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: #111827;
+            border-right: 1px solid #273449;
+            padding: 28px 18px;
+        }
+
+        .brand {
+            color: #60a5fa;
+            font-size: 21px;
+            font-weight: bold;
+            margin-bottom: 38px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 14px;
+            margin-bottom: 9px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 38px;
+        }
+
+        .header {
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+        }
+
+        .header p,
+        .description {
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .card {
+            max-width: 850px;
+            background: #111827;
+            border: 1px solid #273449;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .path-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            min-width: 0;
+            background: #0b1120;
+            color: #e5e7eb;
+            border: 1px solid #374151;
+            border-radius: 7px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .path-input input {
+            flex: 1;
+        }
+
+        input::placeholder {
+            color: #6b7280;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .browse-button {
+            background: #2563eb;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .browse-button:hover {
+            background: #1d4ed8;
+        }
+
+        .start-button {
+            background: #16a34a;
+            color: white;
+            padding: 14px 22px;
+            margin-top: 8px;
+        }
+
+        .start-button:hover {
+            background: #15803d;
+        }
+
+        .show-password {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            margin: 10px 0 20px;
+            color: #cbd5e1;
+        }
+
+        .show-password input {
+            accent-color: #3b82f6;
+        }
+
+        .notice {
+            border-left: 3px solid #f59e0b;
+            background: #292213;
+            padding: 13px;
+            color: #fcd34d;
+            font-size: 13px;
+            line-height: 1.6;
+            border-radius: 4px;
+            margin-bottom: 22px;
+        }
+
+        #status {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 7px;
+            background: #0b1120;
+            color: #93c5fd;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 18px;
+            background: #0b1120;
+            border: 1px solid #374151;
+            border-radius: 9px;
+            overflow-wrap: anywhere;
+        }
+
+        .result h3 {
+            margin-bottom: 12px;
+        }
+
+        .result p {
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        small {
+            display: block;
+            color: #9ca3af;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 9px;
+        }
+
+        @media (max-width: 700px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 18px;
+            }
+
+            .brand {
+                margin-bottom: 18px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .path-input {
+                flex-direction: column;
+            }
+
+            .path-input button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="brand">🔐 SecureFileVault</div>
+
+            <nav>
+                <a class="nav-link" href="/">⌂ Home</a>
+                <a class="nav-link" href="/encrypt">🔒 Encrypt</a>
+                <a class="nav-link active" href="/decrypt">🔓 Decrypt</a>
+                <a class="nav-link" href="/reports">▤ Hash Reports</a>
+                <a class="nav-link" href="/settings">⚙ Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+
+            <header class="header">
+                <h1>🔓 Decrypt Files</h1>
+                <p>
+                    Restore files encrypted by SecureFileVault using
+                    the original encryption password.
+                </p>
+            </header>
+
+            <section class="card">
+                <h2>Encrypted Folder Selection</h2>
+
+                <p class="description">
+                    Choose the folder containing your SecureFileVault
+                    .sfv files, then choose a separate location for restored files.
+                </p>
+
+                <div class="form-group">
+                    <label for="encryptedSource">Encrypted Folder</label>
+
+                    <div class="path-input">
+                        <input type="text" id="encryptedSource" placeholder="Choose the folder containing .sfv files..."
+                            readonly>
+
+                        <button type="button" class="browse-button" id="browseEncrypted">
+                            Choose Folder
+                        </button>
+                    </div>
+
+                    <small>
+                        Select the folder containing the .sfv files,
+                        for example test_encrypted/encrypted_files.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="output">Restored Files Location</label>
+
+                    <div class="path-input">
+                        <input type="text" id="output" placeholder="Choose where restored files should be saved..."
+                            readonly>
+
+                        <button type="button" class="browse-button" id="browseOutput">
+                            Choose Location
+                        </button>
+                    </div>
+
+                    <small>
+                        A new output folder will be created.
+                        Existing files will not be intentionally overwritten.
+                    </small>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Decryption Authentication</h2>
+
+
+                <p class="description">
+                    Verify your email before decrypting files. The email OTP is separate
+                    from your encryption password.
+                </p>
+
+                <div class="form-group">
+                    <label for="otpEmail">Email Address</label>
+                    <div class="path-input">
+                        <input type="email" id="otpEmail" placeholder="Enter your email address" autocomplete="email"
+                            required>
+                        <button type="button" class="browse-button" id="sendOtpButton">
+                            Send OTP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="otpCode">Six-Digit OTP</label>
+                    <div class="path-input">
+                        <input type="text" id="otpCode" placeholder="Enter the OTP from your email" inputmode="numeric"
+                            maxlength="6" autocomplete="one-time-code">
+                        <button type="button" class="browse-button" id="verifyOtpButton">
+                            Verify OTP
+                        </button>
+                    </div>
+                    <small id="otpStatus" role="status" aria-live="polite">
+                        Request an OTP to begin email verification.
+                    </small>
+                </div>
+
+
+                <p class="description">
+                    Enter the same password that was used to encrypt these files.
+                    The password is sent to your local Flask application for
+                    this decryption request and is not saved by this page.
+                </p>
+
+                <div class="form-group">
+                    <label for="password">Encryption Password</label>
+
+                    <input type="password" id="password" autocomplete="current-password"
+                        placeholder="Enter your original encryption password">
+                </div>
+
+                <label class="show-password">
+                    <input type="checkbox" id="showPassword">
+                    Show password
+                </label>
+
+                <div class="notice">
+                    Verify your email using the OTP before starting decryption.
+                    You must also provide the original encryption password.
+                    Keep the encrypted files until you have verified the restored copies.
+                </div>
+
+                <button type="button" class="start-button" id="startDecryption">
+                    Start Decryption
+                </button>
+
+                <div id="status" role="status" aria-live="polite">
+                    Select the encrypted folder, output location and password.
+                </div>
+
+                <div id="result" class="result" aria-live="polite"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        async function browseFolder(type) {
+            const status = document.getElementById("status");
+
+            status.textContent = "Opening folder picker...";
+
+            try {
+                const response = await fetch("/api/select-folder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        type: type
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    status.textContent = data.cancelled
+                        ? "Folder selection cancelled."
+                        : (data.message || "Folder selection failed.");
+                    return;
+                }
+
+                if (type === "source") {
+                    document.getElementById("encryptedSource").value = data.path;
+                } else {
+                    document.getElementById("output").value = data.path;
+                }
+
+                document.getElementById("result").style.display = "none";
+
+                status.textContent = type === "source"
+                    ? "Encrypted folder selected."
+                    : "Restored files location selected.";
+
+            } catch (error) {
+                status.textContent =
+                    "Could not contact Flask. Check whether the application is running.";
+            }
+        }
+
+        document
+            .getElementById("browseEncrypted")
+            .addEventListener("click", function () {
+                browseFolder("source");
+            });
+
+        document
+            .getElementById("browseOutput")
+            .addEventListener("click", function () {
+                browseFolder("output");
+            });
+
+        document
+            .getElementById("showPassword")
+            .addEventListener("change", function () {
+                document.getElementById("password").type =
+                    this.checked ? "text" : "password";
+            });
+
+
+    const otpEmailInput = document.getElementById("otpEmail");
+    const otpCodeInput = document.getElementById("otpCode");
+    const otpStatus = document.getElementById("otpStatus");
+    const sendOtpButton = document.getElementById("sendOtpButton");
+    const verifyOtpButton = document.getElementById("verifyOtpButton");
+    const startDecryptionButton = document.getElementById("startDecryption");
+
+    let emailVerified = false;
+    let verifiedEmail = "";
+
+    startDecryptionButton.disabled = true;
+
+    function resetEmailVerification() {
+        emailVerified = false;
+        verifiedEmail = "";
+        startDecryptionButton.disabled = true;
+    }
+
+    otpEmailInput.addEventListener("input", function () {
+        if (this.value.trim().toLowerCase() !== verifiedEmail.toLowerCase()) {
+            resetEmailVerification();
+            otpStatus.textContent = "Verify this email address before decrypting.";
+        }
+    });
+
+    sendOtpButton.addEventListener("click", async function () {
+        const email = otpEmailInput.value.trim();
+
+        if (!email || !otpEmailInput.checkValidity()) {
+            otpStatus.textContent = "Enter a valid email address.";
+            otpEmailInput.focus();
+            return;
+        }
+
+        resetEmailVerification();
+        sendOtpButton.disabled = true;
+        otpStatus.textContent = "Sending OTP email...";
+
+        try {
+            const response = await fetch("/api/request-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: email,
+                    purpose: "decrypt",
+                    encrypted_folder: document.getElementById("encryptedSource").value.trim()
+                })
+            });
+
+            const data = await response.json();
+            otpStatus.textContent = data.message ||
+                (response.ok ? "OTP sent." : "Could not send OTP.");
+
+            if (response.ok && data.success) {
+                otpCodeInput.value = "";
+                otpCodeInput.focus();
+            }
+        } catch (error) {
+            otpStatus.textContent =
+                "Could not contact Flask. Check the application terminal.";
+        } finally {
+            sendOtpButton.disabled = false;
+        }
+    });
+
+    verifyOtpButton.addEventListener("click", async function () {
+        const otp = otpCodeInput.value.trim();
+
+        if (!/^\d{6}$/.test(otp)) {
+            otpStatus.textContent = "Enter the six-digit OTP.";
+            otpCodeInput.focus();
+            return;
+        }
+
+        verifyOtpButton.disabled = true;
+        otpStatus.textContent = "Verifying OTP...";
+
+        try {
+            const response = await fetch("/api/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                resetEmailVerification();
+                otpStatus.textContent = data.message || "OTP verification failed.";
+                return;
+            }
+
+            emailVerified = true;
+            verifiedEmail = otpEmailInput.value.trim();
+            startDecryptionButton.disabled = false;
+            otpStatus.textContent = "Email verified. You can now decrypt.";
+        } catch (error) {
+            resetEmailVerification();
+            otpStatus.textContent =
+                "Could not contact Flask. Check the application terminal.";
+        } finally {
+            verifyOtpButton.disabled = false;
+        }
+    });
+
+
+        document
+            .getElementById("startDecryption")
+            .addEventListener("click", async function () {
+                const encryptedFolder =
+                    document.getElementById("encryptedSource").value.trim();
+
+                const outputParent =
+                    document.getElementById("output").value.trim();
+
+                const password =
+                    document.getElementById("password").value;
+
+                const status = document.getElementById("status");
+                const button = document.getElementById("startDecryption");
+                const resultPanel = document.getElementById("result");
+
+                if (
+                    !emailVerified ||
+                    otpEmailInput.value.trim().toLowerCase() !== verifiedEmail.toLowerCase()
+                ) {
+                    status.textContent = "Please verify your email OTP first.";
+                    return;
+                }
+
+                resultPanel.replaceChildren();
+                resultPanel.style.display = "none";
+
+                if (!encryptedFolder) {
+                    status.textContent = "Please select the encrypted folder.";
+                    return;
+                }
+
+                if (!outputParent) {
+                    status.textContent = "Please select a restored files location.";
+                    return;
+                }
+
+                if (!password) {
+                    status.textContent = "Please enter the encryption password.";
+                    document.getElementById("password").focus();
+                    return;
+                }
+
+                button.disabled = true;
+                status.textContent =
+                    "Decrypting and verifying files. Please keep this page open...";
+
+                try {
+                    const response = await fetch("/api/decrypt-folder", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                       body: JSON.stringify({
+                            encrypted_folder: encryptedFolder,
+                            output_parent: outputParent,
+                            password: password,
+                            email: otpEmailInput.value.trim()
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        status.textContent =
+                            data.message || "Decryption failed.";
+                        return;
+                    }
+
+                    const details = data.result;
+                    const heading = document.createElement("h3");
+                    heading.textContent = "Decryption Completed";
+
+                    const operationLine = document.createElement("p");
+                    operationLine.textContent =
+                        "Operation folder: " +
+                        (details.operation_folder || "Not provided");
+
+                    const folderLine = document.createElement("p");
+                    folderLine.textContent =
+                        "Restored files folder: " + details.output_folder;
+
+                    const countLine = document.createElement("p");
+                    countLine.textContent =
+                        "Files restored: " + details.decrypted_file_count;
+
+                    const verifiedLine = document.createElement("p");
+                    verifiedLine.textContent =
+                        "Integrity verified: " +
+                        (details.integrity_verified_count ?? 0);
+
+                    const unavailableLine = document.createElement("p");
+                    unavailableLine.textContent =
+                        "Integrity unavailable (SFV1): " +
+                        (details.integrity_unavailable_count ?? 0);
+
+                    resultPanel.append(
+                        heading,
+                        operationLine,
+                        folderLine,
+                        countLine,
+                        verifiedLine,
+                        unavailableLine
+                    );
+
+                    // Show per-file integrity details when available.
+                    if (Array.isArray(details.files) && details.files.length > 0) {
+                        const fileHeading = document.createElement("h3");
+                        fileHeading.textContent = "File Integrity Results";
+                        fileHeading.style.marginTop = "18px";
+                        resultPanel.appendChild(fileHeading);
+
+                        details.files.forEach(file => {
+                            const item = document.createElement("p");
+                            item.textContent =
+                                file.restored_path + " — " +
+                                (file.integrity_status || "Status unavailable");
+                            resultPanel.appendChild(item);
+                        });
+                    }
+
+                    // Show report location or a separate warning.
+                    if (data.report && data.report.report_path) {
+                        const reportHeading = document.createElement("h3");
+                        reportHeading.textContent = "Decryption Excel Report";
+                        reportHeading.style.marginTop = "18px";
+
+                        const reportLine = document.createElement("p");
+                        reportLine.textContent =
+                            "Report saved at: " + data.report.report_path;
+
+                        resultPanel.append(reportHeading, reportLine);
+                    } else {
+                        const warningHeading = document.createElement("h3");
+                        warningHeading.textContent = "Excel Report Not Available";
+                        warningHeading.style.color = "#fbbf24";
+                        warningHeading.style.marginTop = "18px";
+
+                        const warning = document.createElement("p");
+                        warning.textContent = data.report_error
+                            ? "Decryption succeeded, but report generation failed: " +
+                            data.report_error
+                            : "Decryption succeeded, but no report path was returned.";
+
+                        resultPanel.append(warningHeading, warning);
+                    }
+
+                    const note = document.createElement("p");
+                    note.textContent =
+                        "Keep the original encrypted files until you have checked the restored files.";
+                    note.style.marginTop = "14px";
+                    resultPanel.appendChild(note);
+
+                    resultPanel.style.display = "block";
+
+                    status.textContent = data.report
+                        ? "Decryption and integrity report generation completed successfully."
+                        : "Decryption succeeded. Check the report message below.";
+
+
+                } catch (error) {
+                    status.textContent =
+                        "Could not complete decryption. Check the Flask terminal.";
+                } finally {
+                    document.getElementById("password").value = "";
+
+                        resetEmailVerification();
+                        otpCodeInput.value = "";
+
+                    button.disabled = false;
+                }
+            });
+    </script>
+
+</body>
+
+</html>

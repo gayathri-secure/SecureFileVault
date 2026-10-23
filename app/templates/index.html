@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFileVault</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: #f4f6ff;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        aside {
+            width: 235px;
+            padding: 30px 20px;
+            background: #11182b;
+            border-right: 1px solid #26304a;
+        }
+
+        aside h2 {
+            color: #a99aff;
+            margin-bottom: 35px;
+        }
+
+        aside p {
+            padding: 12px;
+            color: #c2cbe0;
+            border-radius: 8px;
+        }
+
+        aside .active {
+            background: #29275b;
+            color: #b8aaff;
+        }
+
+        main {
+            flex: 1;
+            padding: 35px;
+        }
+
+        .hero {
+            padding: 32px;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #24205b, #172440);
+            border: 1px solid #39376e;
+        }
+
+        .hero h1 {
+            margin-top: 0;
+            font-size: 32px;
+        }
+
+        .hero p {
+            color: #c0c9e0;
+            line-height: 1.7;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .card {
+            padding: 24px;
+            border-radius: 14px;
+            background: #131c30;
+            border: 1px solid #293650;
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .muted {
+            color: #9caac5;
+            line-height: 1.6;
+        }
+
+        .status {
+            color: #63e6be;
+        }
+        .nav-link {
+            display: block;
+            padding: 14px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #c7d1e8;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background: #29275b;
+            color: #b8aaff;
+        }
+
+        @media (max-width: 650px) {
+            aside {
+                width: 145px;
+                padding: 18px 10px;
+            }
+
+            main {
+                padding: 18px;
+            }
+
+            .hero h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <aside>
+            <h2>🔐 SecureFileVault</h2>
+            <a class="nav-link active" href="/">⌂ Home</a>
+            <a class="nav-link" href="/encrypt">🔒 Encrypt</a>
+            <a class="nav-link" href="/decrypt">🔓 Decrypt</a>
+            <a class="nav-link" href="/reports">▤ Hash Reports</a>
+            <a class="nav-link" href="/settings">⚙ Settings</a>
+        </aside>
+
+        <main>
+            <section class="hero">
+                <h1>Secure Your Files.</h1>
+                <p>
+                    Encrypt files, protect sensitive data, and verify
+                    integrity through one local security application.
+                </p>
+                <span class="status">● Local application dashboard</span>
+            </section>
+
+            <section class="cards">
+                <div class="card">
+                    <h3>🔒 Encrypt Files</h3>
+                    <p class="muted">
+                        Select a folder and prepare files for secure encryption.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>🔓 Decrypt Files</h3>
+                    <p class="muted">
+                        Authenticate before restoring protected files.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>▤ Hash Reports</h3>
+                    <p class="muted">
+                        Review file hashes and integrity verification results.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
