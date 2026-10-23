@@ -133,13 +133,6 @@ python -c "import secrets; print(secrets.token_hex(32))"
 Copy the generated value into `OTP_SECRET`. Keep the `.env` file
 private.
 
-**Important:** `os.getenv()` reads environment variables provided to the
-process; it does not load a `.env` file by itself. The application must
-load `.env` at startup (for example, using `python-dotenv` and
-`load_dotenv()`), or you must set these variables in your shell before
-starting the app. Do not add real secrets to this README or commit
-`.env` to GitHub.
-
 The application automatically loads the project's root `.env` file at startup using `python-dotenv`. Make sure the file contains a valid `OTP_SECRET`, `GMAIL_ADDRESS`, and `GMAIL_APP_PASSWORD`. The application will stop during startup if `OTP_SECRET` is missing. Never commit `.env` or share your credentials.
 
 ### 5. Start the application
